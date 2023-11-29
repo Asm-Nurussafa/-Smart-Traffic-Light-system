@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+clock clk;
+chan redYellowSig, redSig, greenYellowSig, greenSig, start ;</declaration>
+	<template>
+		<name x="5" y="5">TrafficLight</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-382" y="-153">
+			<name x="-392" y="-187">greenYellow</name>
+		</location>
+		<location id="id1" x="17" y="-297">
+			<name x="7" y="-331">green</name>
+		</location>
+		<location id="id2" x="-331" y="-297">
+			<name x="-341" y="-331">redYellow</name>
+		</location>
+		<location id="id3" x="-595" y="-289">
+			<name x="-596" y="-331">red</name>
+		</location>
+		<location id="id4" x="-722" y="-306">
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-688" y="-314">start !</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-518" y="-204">clk &gt;= 4</label>
+			<label kind="synchronisation" x="-518" y="-187">redSig!</label>
+			<label kind="assignment" x="-518" y="-144">clk =0</label>
+			<nail x="-535" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-272" y="-246">clk &gt;= 20</label>
+			<label kind="synchronisation" x="-280" y="-221">greenYellowSig!</label>
+			<label kind="assignment" x="-246" y="-195">clk = 0</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-204" y="-340">clk &gt;= 3</label>
+			<label kind="synchronisation" x="-204" y="-323">greenSig!</label>
+			<label kind="assignment" x="-195" y="-297">clk =0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-484" y="-331">clk &gt;= 15</label>
+			<label kind="synchronisation" x="-493" y="-314">redYellowSig!</label>
+			<label kind="assignment" x="-476" y="-289">clk =0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Controller</name>
+		<location id="id5" x="-399" y="-221">
+			<name x="-409" y="-255">stop</name>
+		</location>
+		<location id="id6" x="-119" y="-102">
+			<name x="-129" y="-136">go</name>
+		</location>
+		<location id="id7" x="-433" y="-76">
+			<name x="-443" y="-110">prepareToStop</name>
+		</location>
+		<location id="id8" x="-127" y="-212">
+			<name x="-137" y="-246">prepareToGo</name>
+		</location>
+		<location id="id9" x="-518" y="-280">
+		</location>
+		<init ref="id9"/>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-500" y="-267">start?</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-450" y="-178">redSig?</label>
+			<nail x="-484" y="-144"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-323" y="-93">greenYellowSig?</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-106" y="-208">greenSig?</label>
+			<nail x="-85" y="-170"/>
+			<nail x="-76" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-331" y="-238">redYellowSig?</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+t1 =TrafficLight();
+car1 =Controller();
+
+// List one or more processes to be composed into a system.
+system t1, car1;
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not (car1.go and t1.red)
+</formula>
+			<comment>A[] not (car1.go and t1.red) ---&gt; Ensuring the car never moves on red.
+</comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; (t1.red and clk &gt;= 15 and tl.redYellow)</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
